@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #FAFAF8;
+    color: #111111;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: #111111;
+    color: #FAFAF8;
+  }
+}
+
+@layer utilities {
+  .category-label {
+    @apply text-xs tracking-widest uppercase font-sans font-medium text-muted;
+  }
+}
