@@ -29,21 +29,22 @@ export const revalidate = 60
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: { category?: string }
+  searchParams: Promise<{ category?: string }>
 }) {
+  const resolvedParams = await searchParams
+
   const [allEssays, featuredEssay] = await Promise.all([
     client.fetch<Essay[]>(allEssaysQuery),
     client.fetch<Essay | null>(featuredEssayQuery),
   ])
 
-  const selectedCategory = searchParams.category || 'All'
+  const selectedCategory = resolvedParams.category || 'All'
 
   const filtered: Essay[] =
     selectedCategory === 'All'
       ? allEssays
       : allEssays.filter((e) => e.category === selectedCategory)
 
-  // featured must be declared before nonFeatured
   const featured: Essay | null =
     featuredEssay &&
       (selectedCategory === 'All' || featuredEssay.category === selectedCategory)
@@ -56,7 +57,6 @@ export default async function HomePage({
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
       <header className="px-6 md:px-12 py-8 flex items-center justify-between border-b border-border">
         <Link href="/" className="font-serif text-xl tracking-tight text-ink">
           Angel Simcha
@@ -82,7 +82,6 @@ export default async function HomePage({
       </header>
 
       <main className="max-w-4xl mx-auto px-6 md:px-12">
-        {/* Page intro */}
         <div className="pt-16 pb-12">
           <p className="category-label mb-4">Essays & Publications</p>
           <h1 className="font-serif text-5xl md:text-6xl font-light leading-tight text-ink mb-4">
@@ -98,7 +97,6 @@ export default async function HomePage({
 
         <div className="border-t border-border" />
 
-        {/* Featured Essay */}
         {featured && (
           <div className="py-14">
             <p className="category-label mb-6">Featured — {formatDate(featured.publishedAt)}</p>
@@ -106,7 +104,6 @@ export default async function HomePage({
           </div>
         )}
 
-        {/* Category Filters */}
         <div className="border-t border-border pt-10 pb-6">
           <p className="category-label mb-5">All Essays</p>
           <div className="flex flex-wrap gap-2">
@@ -125,7 +122,6 @@ export default async function HomePage({
           </div>
         </div>
 
-        {/* Essay List */}
         <div className="pb-20">
           {nonFeatured.length === 0 && !featured ? (
             <p className="font-sans text-muted py-12">No essays yet in this category.</p>
@@ -142,7 +138,6 @@ export default async function HomePage({
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-border px-6 md:px-12 py-8">
         <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <p className="font-serif text-sm text-muted italic">

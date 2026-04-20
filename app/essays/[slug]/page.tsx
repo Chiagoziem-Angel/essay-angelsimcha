@@ -26,8 +26,13 @@ export async function generateStaticParams() {
   return slugs.map((s) => ({ slug: s.slug }))
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const essay = await client.fetch<EssayPage>(essayBySlugQuery, { slug: params.slug })
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const essay = await client.fetch<EssayPage>(essayBySlugQuery, { slug })
   if (!essay) return {}
   return {
     title: `${essay.title} — Angel Simcha`,
@@ -82,14 +87,18 @@ const portableTextComponents = {
   },
 }
 
-export default async function EssayPage({ params }: { params: { slug: string } }) {
-  const essay = await client.fetch<EssayPage>(essayBySlugQuery, { slug: params.slug })
+export default async function EssayPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const essay = await client.fetch<EssayPage>(essayBySlugQuery, { slug })
 
   if (!essay) notFound()
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
       <header className="px-6 md:px-12 py-8 flex items-center justify-between border-b border-border">
         <Link href="/" className="font-serif text-xl tracking-tight text-ink">
           Angel Simcha
@@ -103,7 +112,6 @@ export default async function EssayPage({ params }: { params: { slug: string } }
       </header>
 
       <main className="max-w-3xl mx-auto px-6 md:px-12 py-16">
-        {/* Essay header */}
         <div className="mb-12">
           {essay.category && (
             <p className="category-label mb-5">{essay.category}</p>
@@ -138,7 +146,6 @@ export default async function EssayPage({ params }: { params: { slug: string } }
           </div>
         </div>
 
-        {/* Essay body */}
         {essay.body && (
           <div className="prose prose-lg max-w-none font-sans leading-relaxed">
             <PortableText value={essay.body} components={portableTextComponents} />
@@ -146,15 +153,12 @@ export default async function EssayPage({ params }: { params: { slug: string } }
         )}
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-border px-6 md:px-12 py-8 mt-16">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <Link href="/" className="font-sans text-sm text-muted hover:text-ink transition-colors">
             ← Back to Essays
           </Link>
-          <p className="font-serif text-sm text-muted italic">
-            Angel Simcha
-          </p>
+          <p className="font-serif text-sm text-muted italic">Angel Simcha</p>
         </div>
       </footer>
     </div>
